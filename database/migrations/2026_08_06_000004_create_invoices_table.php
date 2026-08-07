@@ -93,6 +93,16 @@ return new class extends Migration
             SQL);
         }
 
+        // SQLite (hanya dipakai untuk dev/test lokal, produksi tetap PostgreSQL):
+        // partial index-nya mendukung sintaks WHERE yang sama seperti Postgres.
+        if (DB::getDriverName() === 'sqlite') {
+            DB::statement(<<<'SQL'
+                CREATE UNIQUE INDEX invoices_active_payment_amount_unique
+                ON invoices (qris_merchant_id, payment_amount)
+                WHERE status IN ('created', 'waiting_payment', 'manual_verification')
+            SQL);
+        }
+
         // MySQL 8 tidak punya partial index. Padanannya: generated column yang
         // bernilai NULL saat invoice tidak aktif (NULL tidak ikut unique check).
         if (DB::getDriverName() === 'mysql') {

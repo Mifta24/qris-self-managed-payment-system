@@ -20,21 +20,35 @@ use App\Support\Qris\Exceptions\InvalidQrisPayloadException;
 final class QrisPayload
 {
     public const TAG_PAYLOAD_FORMAT = '00';
+
     public const TAG_POINT_OF_INITIATION = '01';
+
     public const TAG_MERCHANT_CATEGORY = '52';
+
     public const TAG_CURRENCY = '53';
+
     public const TAG_AMOUNT = '54';
+
     public const TAG_TIP_INDICATOR = '55';
+
     public const TAG_TIP_FIXED = '56';
+
     public const TAG_TIP_PERCENT = '57';
+
     public const TAG_COUNTRY = '58';
+
     public const TAG_MERCHANT_NAME = '59';
+
     public const TAG_MERCHANT_CITY = '60';
+
     public const TAG_POSTAL_CODE = '61';
+
     public const TAG_ADDITIONAL_DATA = '62';
+
     public const TAG_CRC = '63';
 
     public const POI_STATIC = '11';
+
     public const POI_DYNAMIC = '12';
 
     public const CURRENCY_IDR = '360';
@@ -43,7 +57,7 @@ final class QrisPayload
     private array $nodes;
 
     /**
-     * @param array<int, TlvNode> $nodes
+     * @param  array<int, TlvNode>  $nodes
      */
     private function __construct(array $nodes)
     {
@@ -269,14 +283,14 @@ final class QrisPayload
             $body .= $node->toString();
         }
 
-        return $body . self::TAG_CRC . '04';
+        return $body.self::TAG_CRC.'04';
     }
 
     public function toString(): string
     {
         $body = $this->bodyWithCrcHeader();
 
-        return $body . Crc16::compute($body);
+        return $body.Crc16::compute($body);
     }
 
     public function __toString(): string

@@ -8,7 +8,7 @@ use App\Support\Qris\QrisPayload;
 use Tests\Support\QrisTestPayload;
 
 beforeEach(function () {
-    $this->generator = new DynamicQrisGenerator();
+    $this->generator = new DynamicQrisGenerator;
 });
 
 it('adds the transaction amount and keeps the payload valid', function () {
@@ -127,7 +127,7 @@ it('parses the real merchant payload', function () {
         ->and($payload->currency())->toBe('360')
         ->and($payload->amount())->toBeNull();
 
-    $result = (new DynamicQrisGenerator())->generate($raw, 100237);
+    $result = (new DynamicQrisGenerator)->generate($raw, 100237);
 
     expect(QrisPayload::parse($result)->crcIsValid())->toBeTrue();
 });

@@ -22,7 +22,7 @@ final class TlvNode
     private ?array $children;
 
     /**
-     * @param array<int, TlvNode>|null $children
+     * @param  array<int, TlvNode>|null  $children
      */
     public function __construct(
         public readonly string $tag,
@@ -84,7 +84,7 @@ final class TlvNode
         }
 
         return $this->tag
-            . str_pad((string) $length, 2, '0', STR_PAD_LEFT)
-            . $value;
+            .str_pad((string) $length, 2, '0', STR_PAD_LEFT)
+            .$value;
     }
 }

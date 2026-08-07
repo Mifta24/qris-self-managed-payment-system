@@ -29,11 +29,10 @@ final class DynamicQrisGenerator
         private readonly bool $markAsDynamic = false,
         private readonly bool $stripTipFields = true,
         private readonly bool $requireValidSourceCrc = true,
-    ) {
-    }
+    ) {}
 
     /**
-     * @param int $amount Nominal dalam rupiah penuh (bukan sen).
+     * @param  int  $amount  Nominal dalam rupiah penuh (bukan sen).
      */
     public function generate(string $staticPayload, int $amount): string
     {

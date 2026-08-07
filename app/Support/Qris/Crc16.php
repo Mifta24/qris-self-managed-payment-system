@@ -17,6 +17,7 @@ namespace App\Support\Qris;
 final class Crc16
 {
     private const POLYNOMIAL = 0x1021;
+
     private const INITIAL = 0xFFFF;
 
     /**
