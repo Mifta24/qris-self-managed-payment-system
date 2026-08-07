@@ -9,14 +9,14 @@ fase kecuali ada alasan jelas.
 - [x] Parser TLV + CRC16 + generator QRIS dinamis
 - [x] Test untuk domain QRIS
 
-## Fase 1 — Invoice bisa dibuat
+## Fase 1 — Invoice bisa dibuat ✅
 
-- [ ] Enum `InvoiceStatus` dengan state machine
-- [ ] Model + cast (`encrypted`, `integer`, `datetime`) sesuai `docs/database.md`
-- [ ] `UniqueCodeAllocator` — alokasi lewat unique constraint, retry saat
+- [x] Enum `InvoiceStatus` dengan state machine
+- [x] Model + cast (`encrypted`, `integer`, `datetime`) sesuai `docs/database.md`
+- [x] `UniqueCodeAllocator` — alokasi lewat unique constraint, retry saat
       bentrok, `NoAvailableAmountException` saat rentang habis
-- [ ] `InvoiceService::create()` — satu transaksi: alokasi + generate + simpan
-- [ ] Test: bentrok kode unik, rentang habis, idempotency
+- [x] `InvoiceService::create()` — satu transaksi: alokasi + generate + simpan
+- [x] Test: bentrok kode unik, rentang habis, idempotency
 
 ## Fase 2 — API bisa dipakai project
 
