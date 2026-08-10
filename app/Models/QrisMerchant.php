@@ -21,6 +21,14 @@ final class QrisMerchant extends Model
         'verified_at',
     ];
 
+    /**
+     * static_payload sengaja tidak pernah ikut serialize, sama seperti
+     * qris_payload di Invoice — lihat aturan mutlak #5 di CLAUDE.md.
+     */
+    protected $hidden = [
+        'static_payload',
+    ];
+
     protected function casts(): array
     {
         return [
