@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\TestResponse;
+use Tests\Support\ApiRequestSigner;
 use Tests\TestCase;
 
 /*
@@ -44,7 +46,32 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
-{
-    // ..
+/**
+ * Mengirim request JSON yang ditandatangani penuh (X-Api-Key/X-Timestamp/
+ * X-Signature) sesuai skema di docs/api-contract.md. Body di-encode sekali
+ * lalu dipakai persis sama untuk penandatanganan dan pengiriman, supaya
+ * tidak ada celah perbedaan encoding antara keduanya.
+ *
+ * @param  array<string, mixed>  $payload
+ * @param  array<string, string>  $headerOverrides
+ */
+function callSigned(
+    string $method,
+    string $uri,
+    array $payload,
+    string $apiKeyPlain,
+    string $signingSecret,
+    array $headerOverrides = [],
+    ?int $timestamp = null,
+): TestResponse {
+    $body = $payload === [] ? '' : json_encode($payload, JSON_THROW_ON_ERROR);
+
+    $headers = ApiRequestSigner::headers($apiKeyPlain, $signingSecret, $method, $uri, $body, $timestamp);
+
+    $headers = array_merge($headers, [
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+    ], $headerOverrides);
+
+    return test()->call($method, $uri, [], [], [], test()->transformHeadersToServerVars($headers), $body);
 }

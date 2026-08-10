@@ -18,13 +18,13 @@ fase kecuali ada alasan jelas.
 - [x] `InvoiceService::create()` — satu transaksi: alokasi + generate + simpan
 - [x] Test: bentrok kode unik, rentang habis, idempotency
 
-## Fase 2 — API bisa dipakai project
+## Fase 2 — API bisa dipakai project ✅
 
-- [ ] Middleware autentikasi API key + HMAC (lihat `docs/api-contract.md`)
-- [ ] `POST /invoices`, `GET /invoices/{id}`, `GET /invoices/{id}/status`
-- [ ] Rate limiting per API key
-- [ ] Format error konsisten
-- [ ] Test: signature salah, timestamp kedaluwarsa, key dicabut, replay
+- [x] Middleware autentikasi API key + HMAC (lihat `docs/api-contract.md`)
+- [x] `POST /invoices`, `GET /invoices/{id}`, `GET /invoices/{id}/status`
+- [x] Rate limiting per API key
+- [x] Format error konsisten
+- [x] Test: signature salah, timestamp kedaluwarsa, key dicabut, replay
 
 ## Fase 3 — Customer bisa membayar
 
