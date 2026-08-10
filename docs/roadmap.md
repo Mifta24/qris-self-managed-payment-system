@@ -33,13 +33,13 @@ fase kecuali ada alasan jelas.
 - [x] Polling status tiap 5 detik
 - [x] Halaman untuk invoice expired / sudah dibayar / dibatalkan
 
-## Fase 4 — Admin bisa mengonfirmasi
+## Fase 4 — Admin bisa mengonfirmasi ✅
 
-- [ ] Filament: resource Project, ApiKey, QrisMerchant, Invoice
-- [ ] Antrian verifikasi: daftar invoice menunggu, urut nominal
-- [ ] Action konfirmasi: input RRN + waktu bayar, validasi nominal cocok
-- [ ] Audit log tercatat di setiap perubahan status
-- [ ] Notifikasi Telegram saat invoice baru dibuat
+- [x] Filament: resource Project, ApiKey, QrisMerchant, Invoice
+- [x] Antrian verifikasi: daftar invoice menunggu, urut nominal
+- [x] Action konfirmasi: input RRN + waktu bayar, validasi nominal cocok
+- [x] Audit log tercatat di setiap perubahan status
+- [x] Notifikasi Telegram saat invoice baru dibuat
 
 ## Fase 5 — Sistem bisa ditinggal jalan
 
