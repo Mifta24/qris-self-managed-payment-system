@@ -9,12 +9,17 @@ Alpine.data('paymentPage', ({ status, expiresAt, statusUrl }) => ({
     pollTimer: null,
 
     init() {
+        // Countdown dan reload-saat-kedaluwarsa cuma relevan selama invoice
+        // masih pending. Invoice yang sudah terminal (misalnya dikonfirmasi
+        // sebagai late payment setelah expires_at lewat) tidak boleh
+        // memicu reload berulang hanya karena expires_at-nya di masa lalu.
+        if (!PENDING_STATUSES.includes(this.status)) {
+            return;
+        }
+
         this.tickCountdown(expiresAt);
         this.countdownTimer = setInterval(() => this.tickCountdown(expiresAt), 1000);
-
-        if (PENDING_STATUSES.includes(this.status)) {
-            this.pollTimer = setInterval(() => this.checkStatus(), 5000);
-        }
+        this.pollTimer = setInterval(() => this.checkStatus(), 5000);
     },
 
     tickCountdown(expiresAt) {
