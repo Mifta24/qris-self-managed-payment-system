@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Enums\InvoiceStatus;
 use App\Exceptions\ExternalIdConflictException;
+use App\Jobs\NotifyAdminOfNewInvoiceJob;
 use App\Models\AuditLog;
 use App\Models\Invoice;
 use App\Models\Project;
@@ -53,7 +54,7 @@ final class InvoiceService
             return $existing;
         }
 
-        return DB::transaction(function () use ($project, $data): Invoice {
+        $invoice = DB::transaction(function () use ($project, $data): Invoice {
             $invoice = $this->allocator->allocate(
                 $project,
                 $data['amount'],
@@ -70,6 +71,13 @@ final class InvoiceService
 
             return $invoice;
         });
+
+        // Di luar transaksi: koneksi queue `database` tidak afterCommit
+        // secara default, jadi dispatch di sini memastikan job baru jalan
+        // setelah baris invoice benar-benar tersimpan.
+        NotifyAdminOfNewInvoiceJob::dispatch($invoice);
+
+        return $invoice;
     }
 
     /**

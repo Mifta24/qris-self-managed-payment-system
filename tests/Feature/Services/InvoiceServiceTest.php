@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 use App\Enums\InvoiceStatus;
 use App\Exceptions\ExternalIdConflictException;
+use App\Jobs\NotifyAdminOfNewInvoiceJob;
 use App\Models\AuditLog;
 use App\Models\Invoice;
 use App\Models\Project;
 use App\Models\QrisMerchant;
 use App\Services\InvoiceService;
 use App\Support\Qris\QrisPayload;
+use Illuminate\Support\Facades\Queue;
 use Tests\Support\QrisTestPayload;
 
 beforeEach(function () {
@@ -128,4 +130,34 @@ it('writes an audit log entry when an invoice is created', function () {
     expect($log)->not->toBeNull()
         ->and($log->event)->toBe('invoice.created')
         ->and($log->new_values['status'])->toBe(InvoiceStatus::WaitingPayment->value);
+});
+
+it('dispatches a telegram notification job when a new invoice is created', function () {
+    Queue::fake();
+
+    $invoice = $this->service->create($this->project, [
+        'external_id' => 'ORDER-1',
+        'amount' => 100000,
+    ]);
+
+    Queue::assertPushed(NotifyAdminOfNewInvoiceJob::class, function (NotifyAdminOfNewInvoiceJob $job) use ($invoice) {
+        return $job->invoice->is($invoice);
+    });
+    Queue::assertPushed(NotifyAdminOfNewInvoiceJob::class, 1);
+});
+
+it('does not dispatch the notification job again when idempotency returns an existing invoice', function () {
+    Queue::fake();
+
+    $this->service->create($this->project, [
+        'external_id' => 'ORDER-1',
+        'amount' => 100000,
+    ]);
+
+    $this->service->create($this->project, [
+        'external_id' => 'ORDER-1',
+        'amount' => 100000,
+    ]);
+
+    Queue::assertPushed(NotifyAdminOfNewInvoiceJob::class, 1);
 });
