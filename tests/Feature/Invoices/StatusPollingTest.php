@@ -60,3 +60,12 @@ it('reflects a paid status once the invoice is confirmed', function () {
         ->assertJsonPath('status', InvoiceStatus::Paid->value)
         ->assertJsonPath('paid_at', $paidAt->toIso8601String());
 });
+
+it('lazily expires a waiting_payment invoice whose expires_at has already passed', function () {
+    $this->invoice->forceFill(['expires_at' => now()->subMinute()])->save();
+
+    $response = $this->getJson("/invoice/{$this->invoice->invoice_number}/status");
+
+    $response->assertOk()->assertJsonPath('status', InvoiceStatus::Expired->value);
+    expect($this->invoice->fresh()->status)->toBe(InvoiceStatus::Expired);
+});

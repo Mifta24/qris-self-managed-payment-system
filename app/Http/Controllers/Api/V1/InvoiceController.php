@@ -9,6 +9,7 @@ use App\Http\Requests\Api\V1\StoreInvoiceRequest;
 use App\Http\Resources\InvoiceResource;
 use App\Models\Invoice;
 use App\Models\Project;
+use App\Services\InvoiceExpiryService;
 use App\Services\InvoiceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,7 @@ final class InvoiceController extends Controller
 {
     public function __construct(
         private readonly InvoiceService $invoiceService,
+        private readonly InvoiceExpiryService $expiryService,
     ) {}
 
     public function store(StoreInvoiceRequest $request): JsonResponse
@@ -30,12 +32,12 @@ final class InvoiceController extends Controller
 
     public function show(Request $request, string $invoice): InvoiceResource
     {
-        return new InvoiceResource($this->findInvoice($request, $invoice));
+        return new InvoiceResource($this->expiryService->expireIfDue($this->findInvoice($request, $invoice)));
     }
 
     public function status(Request $request, string $invoice): JsonResponse
     {
-        $model = $this->findInvoice($request, $invoice);
+        $model = $this->expiryService->expireIfDue($this->findInvoice($request, $invoice));
 
         return response()->json([
             'invoice_id' => $model->invoice_number,

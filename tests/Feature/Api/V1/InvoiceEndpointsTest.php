@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Enums\InvoiceStatus;
 use App\Models\ApiKey;
+use App\Models\Invoice;
 use App\Models\Project;
 use App\Models\QrisMerchant;
 use App\Support\ApiKeyGenerator;
@@ -130,4 +131,32 @@ it('returns 404 for a nonexistent invoice number', function () {
     $response = callSigned('GET', '/api/v1/invoices/INV-DOES-NOT-EXIST', [], $this->apiKeyPlain, $this->signingSecret);
 
     $response->assertStatus(404)->assertJsonPath('error.code', 'invoice_not_found');
+});
+
+it('lazily expires a waiting_payment invoice whose expires_at has already passed on show', function () {
+    $create = callSigned('POST', '/api/v1/invoices', [
+        'external_id' => 'ORDER-1',
+        'amount' => 100000,
+    ], $this->apiKeyPlain, $this->signingSecret);
+
+    $invoiceId = $create->json('invoice_id');
+    Invoice::where('invoice_number', $invoiceId)->update(['expires_at' => now()->subMinute()]);
+
+    $response = callSigned('GET', "/api/v1/invoices/{$invoiceId}", [], $this->apiKeyPlain, $this->signingSecret);
+
+    $response->assertStatus(200)->assertJsonPath('status', InvoiceStatus::Expired->value);
+});
+
+it('lazily expires a waiting_payment invoice whose expires_at has already passed on status', function () {
+    $create = callSigned('POST', '/api/v1/invoices', [
+        'external_id' => 'ORDER-1',
+        'amount' => 100000,
+    ], $this->apiKeyPlain, $this->signingSecret);
+
+    $invoiceId = $create->json('invoice_id');
+    Invoice::where('invoice_number', $invoiceId)->update(['expires_at' => now()->subMinute()]);
+
+    $response = callSigned('GET', "/api/v1/invoices/{$invoiceId}/status", [], $this->apiKeyPlain, $this->signingSecret);
+
+    $response->assertStatus(200)->assertJsonPath('status', InvoiceStatus::Expired->value);
 });
