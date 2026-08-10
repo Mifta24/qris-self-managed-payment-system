@@ -26,12 +26,12 @@ fase kecuali ada alasan jelas.
 - [x] Format error konsisten
 - [x] Test: signature salah, timestamp kedaluwarsa, key dicabut, replay
 
-## Fase 3 — Customer bisa membayar
+## Fase 3 — Customer bisa membayar ✅
 
-- [ ] Renderer QR: payload → SVG, dicache berdasarkan hash payload
-- [ ] Halaman pembayaran publik: QR, nominal, countdown, instruksi
-- [ ] Polling status tiap 5 detik
-- [ ] Halaman untuk invoice expired / sudah dibayar / dibatalkan
+- [x] Renderer QR: payload → SVG, dicache berdasarkan hash payload
+- [x] Halaman pembayaran publik: QR, nominal, countdown, instruksi
+- [x] Polling status tiap 5 detik
+- [x] Halaman untuk invoice expired / sudah dibayar / dibatalkan
 
 ## Fase 4 — Admin bisa mengonfirmasi
 
