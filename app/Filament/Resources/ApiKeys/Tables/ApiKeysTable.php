@@ -12,7 +12,9 @@ use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ApiKeysTable
 {
@@ -27,7 +29,8 @@ class ApiKeysTable
                 TextColumn::make('key_prefix')
                     ->label('API Key')
                     ->formatStateUsing(fn (string $state): string => "{$state}…")
-                    ->weight(FontWeight::Medium),
+                    ->weight(FontWeight::Medium)
+                    ->copyable(),
                 TextColumn::make('status')
                     ->label('Status')
                     ->state(function (ApiKey $record): string {
@@ -57,6 +60,23 @@ class ApiKeysTable
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                SelectFilter::make('status')
+                    ->options([
+                        'aktif' => 'Aktif',
+                        'kedaluwarsa' => 'Kedaluwarsa',
+                        'dicabut' => 'Dicabut',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return match ($data['value'] ?? null) {
+                            'dicabut' => $query->whereNotNull('revoked_at'),
+                            'kedaluwarsa' => $query->whereNull('revoked_at')->where('expires_at', '<', now()),
+                            'aktif' => $query->whereNull('revoked_at')
+                                ->where(fn (Builder $query): Builder => $query->whereNull('expires_at')->orWhere('expires_at', '>=', now())),
+                            default => $query,
+                        };
+                    }),
             ])
             ->recordActions([
                 EditAction::make(),
