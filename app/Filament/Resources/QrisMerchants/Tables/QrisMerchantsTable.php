@@ -17,7 +17,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
@@ -31,7 +35,8 @@ class QrisMerchantsTable
         return $table
             ->columns([
                 TextColumn::make('code')
-                    ->searchable(),
+                    ->searchable()
+                    ->copyable(),
                 TextColumn::make('label')
                     ->searchable(),
                 TextColumn::make('merchant_name')
@@ -39,16 +44,32 @@ class QrisMerchantsTable
                 IconColumn::make('is_active')
                     ->boolean(),
                 TextColumn::make('verified_at')
-                    ->dateTime()
+                    ->label('Verifikasi')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => $state === null
+                        ? 'Belum diverifikasi'
+                        : Carbon::parse($state)->format('d M Y H:i'))
+                    ->color(fn (?string $state): string => $state === null ? 'warning' : 'success')
                     ->sortable(),
                 TextColumn::make('projects_count')
                     ->label('Jumlah project')
                     ->counts('projects')
                     ->sortable(),
+                TextColumn::make('currency')
+                    ->label('Mata uang')
+                    ->formatStateUsing(fn (string $state): string => $state === '360' ? 'IDR' : $state)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                TernaryFilter::make('is_active')
+                    ->label('Status aktif'),
+                Filter::make('belum_diverifikasi')
+                    ->label('Belum diverifikasi')
+                    ->query(fn (Builder $query): Builder => $query->whereNull('verified_at')),
             ])
             ->recordActions([
                 EditAction::make(),
