@@ -9,11 +9,13 @@ use App\Exceptions\ConfirmedAmountMismatchException;
 use App\Exceptions\InvalidStatusTransitionException;
 use App\Exceptions\LatePaymentAmountConflictException;
 use App\Exceptions\LatePaymentReasonRequiredException;
+use App\Jobs\SendCallbackJob;
 use App\Models\AuditLog;
 use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * Konfirmasi pembayaran oleh admin. Terpisah dari InvoiceService karena ini
@@ -37,7 +39,7 @@ final class InvoicePaymentConfirmationService
      */
     public function confirm(Invoice $invoice, User $admin, array $data): Invoice
     {
-        return DB::transaction(function () use ($invoice, $admin, $data): Invoice {
+        $invoice = DB::transaction(function () use ($invoice, $admin, $data): Invoice {
             // Kunci baris ini dulu, baru validasi ulang state-nya setelah lock
             // didapat — supaya dua admin yang menekan konfirmasi hampir
             // bersamaan pada invoice yang sama tidak lolos berdua.
@@ -83,6 +85,13 @@ final class InvoicePaymentConfirmationService
 
             return $invoice;
         });
+
+        // Di luar transaksi: koneksi queue `database` tidak afterCommit
+        // secara default, jadi dispatch di sini memastikan job baru jalan
+        // setelah perubahan status benar-benar tersimpan.
+        SendCallbackJob::dispatch($invoice->id, 'invoice.paid', (string) Str::uuid());
+
+        return $invoice;
     }
 
     /**

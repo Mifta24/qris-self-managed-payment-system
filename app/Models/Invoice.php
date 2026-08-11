@@ -35,6 +35,7 @@ final class Invoice extends Model
         'cancellation_reason',
         'callback_url',
         'callback_delivered_at',
+        'callback_failed_at',
         'metadata',
     ];
 
@@ -59,6 +60,7 @@ final class Invoice extends Model
             'confirmed_at' => 'datetime',
             'cancelled_at' => 'datetime',
             'callback_delivered_at' => 'datetime',
+            'callback_failed_at' => 'datetime',
             'metadata' => 'array',
         ];
     }

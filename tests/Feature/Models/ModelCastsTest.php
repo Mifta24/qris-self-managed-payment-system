@@ -7,6 +7,7 @@ use App\Models\ApiKey;
 use App\Models\Invoice;
 use App\Models\Project;
 use App\Models\QrisMerchant;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\QrisTestPayload;
 
@@ -56,6 +57,28 @@ it('encrypts signing_secret at rest and hides it from serialization', function (
         ->and($apiKey->fresh()->toArray())->not->toHaveKeys(['signing_secret', 'key_hash']);
 });
 
+it('encrypts callback_signing_secret at rest and hides it from serialization', function () {
+    $merchant = QrisMerchant::create([
+        'code' => 'gopay-utama',
+        'label' => 'GoPay Merchant',
+        'static_payload' => QrisTestPayload::static(),
+        'currency' => '360',
+    ]);
+
+    $project = Project::create([
+        'slug' => 'restoran-a',
+        'name' => 'Restoran A',
+        'qris_merchant_id' => $merchant->id,
+        'callback_signing_secret' => 'super-secret-callback-key',
+    ]);
+
+    $columnOnDisk = DB::table('projects')->where('id', $project->id)->value('callback_signing_secret');
+
+    expect($columnOnDisk)->not->toBe('super-secret-callback-key')
+        ->and($project->fresh()->callback_signing_secret)->toBe('super-secret-callback-key')
+        ->and($project->fresh()->toArray())->not->toHaveKey('callback_signing_secret');
+});
+
 it('casts invoice status to the InvoiceStatus enum and hides qris_payload from serialization', function () {
     $merchant = QrisMerchant::create([
         'code' => 'gopay-utama',
@@ -91,4 +114,34 @@ it('casts invoice status to the InvoiceStatus enum and hides qris_payload from s
         ->and($fresh->payment_amount)->toBeInt()
         ->and($fresh->toArray())->not->toHaveKey('qris_payload')
         ->and(json_encode($fresh))->not->toContain('raw-dynamic-payload-should-never-leak');
+});
+
+it('casts invoice callback_failed_at to a datetime', function () {
+    $merchant = QrisMerchant::create([
+        'code' => 'gopay-utama',
+        'label' => 'GoPay Merchant',
+        'static_payload' => QrisTestPayload::static(),
+        'currency' => '360',
+    ]);
+
+    $project = Project::create([
+        'slug' => 'restoran-a',
+        'name' => 'Restoran A',
+        'qris_merchant_id' => $merchant->id,
+    ]);
+
+    $invoice = Invoice::create([
+        'invoice_number' => 'INV-20260806-0001',
+        'project_id' => $project->id,
+        'qris_merchant_id' => $merchant->id,
+        'external_id' => 'ORDER-1',
+        'base_amount' => 100000,
+        'unique_code' => 237,
+        'payment_amount' => 100237,
+        'qris_payload' => 'raw-dynamic-payload-should-never-leak',
+        'status' => InvoiceStatus::WaitingPayment,
+        'callback_failed_at' => now(),
+    ]);
+
+    expect($invoice->fresh()->callback_failed_at)->toBeInstanceOf(Carbon::class);
 });

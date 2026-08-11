@@ -24,6 +24,12 @@ Satu baris per project yang boleh memakai API. `slug` dipakai sebagai
 `project_id` di request. Konfigurasi per project: TTL invoice, rentang kode
 unik, callback URL, kanal notifikasi.
 
+`callback_signing_secret` (encrypted) dipakai untuk menandatangani callback
+KELUAR (`X-Qris-Signature`), terpisah dari `api_keys.signing_secret` yang
+menandatangani request MASUK dari project. Satu project bisa punya beberapa
+API key, jadi tidak ada satu `signing_secret` API key yang bisa dijadikan
+acuan tunggal untuk callback.
+
 ### `api_keys`
 Kredensial per project. Perhatikan pemisahan tiga kolom:
 
@@ -41,6 +47,8 @@ Tabel inti.
   `confirmed_at` = waktu admin menekan tombol. **Jangan disatukan** — keduanya
   dibutuhkan untuk rekonsiliasi yang jujur.
 - `callback_url` di-snapshot per invoice, tidak dibaca dari project saat kirim.
+- `callback_failed_at` diisi `SendCallbackJob` setelah percobaan ke-6 gagal —
+  penanda invoice butuh perhatian admin di dashboard.
 - `qris_payload` menyimpan payload dinamis. Gambar QR tidak pernah disimpan
   sebagai file; dirender on the fly lalu dicache.
 

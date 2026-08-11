@@ -3,12 +3,14 @@
 declare(strict_types=1);
 
 use App\Enums\InvoiceStatus;
+use App\Jobs\SendCallbackJob;
 use App\Models\AuditLog;
 use App\Models\Invoice;
 use App\Models\Project;
 use App\Models\QrisMerchant;
 use App\Services\InvoiceExpiryService;
 use App\Services\InvoiceService;
+use Illuminate\Support\Facades\Queue;
 use Tests\Support\QrisTestPayload;
 
 beforeEach(function () {
@@ -99,4 +101,17 @@ it('is idempotent: calling it twice only writes one audit log', function () {
     $this->service->expireIfDue($invoice->fresh());
 
     expect(AuditLog::where('auditable_id', $invoice->id)->where('event', 'invoice.expired')->count())->toBe(1);
+});
+
+it('dispatches SendCallbackJob for invoice.expired only on the call that actually transitions the status', function () {
+    Queue::fake();
+
+    $invoice = makeInvoiceForExpiry();
+    $invoice->forceFill(['expires_at' => now()->subMinute()])->save();
+
+    $this->service->expireIfDue($invoice);
+    $this->service->expireIfDue($invoice->fresh());
+
+    Queue::assertPushed(SendCallbackJob::class, 1);
+    Queue::assertPushed(SendCallbackJob::class, fn (SendCallbackJob $job): bool => $job->invoiceId === $invoice->id && $job->eventType === 'invoice.expired');
 });

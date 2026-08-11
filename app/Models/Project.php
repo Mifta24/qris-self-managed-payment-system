@@ -18,6 +18,7 @@ final class Project extends Model
         'name',
         'qris_merchant_id',
         'callback_url',
+        'callback_signing_secret',
         'is_active',
         'invoice_ttl_minutes',
         'unique_code_min',
@@ -25,9 +26,14 @@ final class Project extends Model
         'notification_config',
     ];
 
+    protected $hidden = [
+        'callback_signing_secret',
+    ];
+
     protected function casts(): array
     {
         return [
+            'callback_signing_secret' => 'encrypted',
             'is_active' => 'boolean',
             'invoice_ttl_minutes' => 'integer',
             'unique_code_min' => 'integer',

@@ -124,15 +124,23 @@ Header:
 | `X-Qris-Event` | `invoice.paid`, `invoice.expired`, `invoice.cancelled` |
 | `X-Qris-Event-Id` | UUID, sama untuk semua percobaan retry |
 | `X-Qris-Timestamp` | Unix timestamp |
-| `X-Qris-Signature` | `hex(hmac_sha256(signing_secret, timestamp . "." . raw_body))` |
+| `X-Qris-Signature` | `hex(hmac_sha256(callback_signing_secret, timestamp . "." . raw_body))` |
+
+`callback_signing_secret` disimpan per project (`projects.callback_signing_secret`),
+terpisah dari `signing_secret` milik API key — satu project bisa punya
+beberapa API key (termasuk yang sudah di-revoke), jadi tidak ada satu
+`signing_secret` API key yang bisa dijadikan acuan tunggal untuk menandatangani
+callback keluar.
 
 Body memuat field yang sama dengan response detail invoice.
 
 Aturan:
 
 - Callback dianggap berhasil hanya kalau status response 2xx.
-- Retry: 10 detik, 60 detik, 5 menit, 30 menit, 2 jam, 6 jam. Setelah percobaan
-  keenam gagal, invoice ditandai butuh perhatian admin di dashboard.
+- Retry: percobaan pertama langsung, lalu jeda 10 detik, 60 detik, 5 menit,
+  30 menit, 2 jam sebelum percobaan ke-2 sampai ke-6. Setelah percobaan ke-6
+  gagal, invoice ditandai butuh perhatian admin di dashboard
+  (`invoices.callback_failed_at` terisi).
 - Setiap percobaan menulis satu baris `callback_logs`.
 - Penerima harus idempotent lewat `X-Qris-Event-Id`. Sebutkan ini di dokumentasi
   integrasi untuk project.

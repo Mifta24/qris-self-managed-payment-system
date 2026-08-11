@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Projects\Schemas;
 
 use App\Models\QrisMerchant;
+use App\Support\SigningSecretGenerator;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -35,6 +36,13 @@ class ProjectForm
                     ->required(),
                 TextInput::make('callback_url')
                     ->url(),
+                TextInput::make('callback_signing_secret')
+                    ->label('Callback signing secret')
+                    ->disabled(fn (string $operation): bool => $operation === 'edit')
+                    ->dehydrated()
+                    ->default(fn (): string => app(SigningSecretGenerator::class)->generate())
+                    ->copyable()
+                    ->helperText('Dipakai project untuk verifikasi X-Qris-Signature pada callback. Tidak bisa diubah setelah dibuat.'),
                 Toggle::make('is_active')
                     ->required()
                     ->default(true),

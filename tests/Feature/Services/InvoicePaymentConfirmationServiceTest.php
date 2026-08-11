@@ -7,6 +7,7 @@ use App\Exceptions\ConfirmedAmountMismatchException;
 use App\Exceptions\InvalidStatusTransitionException;
 use App\Exceptions\LatePaymentAmountConflictException;
 use App\Exceptions\LatePaymentReasonRequiredException;
+use App\Jobs\SendCallbackJob;
 use App\Models\AuditLog;
 use App\Models\Invoice;
 use App\Models\Project;
@@ -15,6 +16,7 @@ use App\Models\User;
 use App\Services\InvoicePaymentConfirmationService;
 use App\Services\InvoiceService;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Queue;
 use Tests\Support\QrisTestPayload;
 
 beforeEach(function () {
@@ -158,6 +160,20 @@ it('rejects late payment confirmation when another active invoice now holds the 
         'confirmation_note' => 'Pembayaran terlambat.',
     ]);
 })->throws(LatePaymentAmountConflictException::class);
+
+it('dispatches SendCallbackJob for invoice.paid after a successful confirm', function () {
+    Queue::fake();
+
+    $invoice = makeInvoiceForConfirmation();
+
+    $this->service->confirm($invoice, $this->admin, [
+        'confirmed_amount' => $invoice->payment_amount,
+        'confirmation_reference' => 'RRN123456',
+        'paid_at' => now(),
+    ]);
+
+    Queue::assertPushed(SendCallbackJob::class, fn (SendCallbackJob $job): bool => $job->invoiceId === $invoice->id && $job->eventType === 'invoice.paid');
+});
 
 it('does not modify an already paid invoice on a rejected retry', function () {
     $invoice = makeInvoiceForConfirmation();

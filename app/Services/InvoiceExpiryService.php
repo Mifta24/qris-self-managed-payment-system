@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\InvoiceStatus;
+use App\Jobs\SendCallbackJob;
 use App\Models\AuditLog;
 use App\Models\Invoice;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * Transisi `waiting_payment -> expired` saat `expires_at` sudah lewat.
@@ -24,11 +26,15 @@ final class InvoiceExpiryService
             return $invoice;
         }
 
-        return DB::transaction(function () use ($invoice): Invoice {
+        // Transisi status hanya benar-benar terjadi sekali walau expireIfDue()
+        // dipanggil berkali-kali (jalur lazy tiap invoice dibaca + scheduler).
+        // `transitioned` dipakai di luar closure supaya callback cuma
+        // dispatch pada panggilan yang benar-benar mengubah status.
+        ['invoice' => $locked, 'transitioned' => $transitioned] = DB::transaction(function () use ($invoice): array {
             $locked = Invoice::whereKey($invoice->id)->lockForUpdate()->firstOrFail();
 
             if (! $this->isDue($locked)) {
-                return $locked;
+                return ['invoice' => $locked, 'transitioned' => false];
             }
 
             $oldValues = ['status' => $locked->status->value];
@@ -43,8 +49,14 @@ final class InvoiceExpiryService
                 'new_values' => ['status' => InvoiceStatus::Expired->value],
             ]);
 
-            return $locked;
+            return ['invoice' => $locked, 'transitioned' => true];
         });
+
+        if ($transitioned) {
+            SendCallbackJob::dispatch($locked->id, 'invoice.expired', (string) Str::uuid());
+        }
+
+        return $locked;
     }
 
     private function isDue(Invoice $invoice): bool
