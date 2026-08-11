@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Invoices\Schemas;
 
 use App\Models\Invoice;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\RepeatableEntry\TableColumn;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -44,6 +46,28 @@ class InvoiceInfolist
                 TextEntry::make('cancelled_at')->dateTime(),
                 TextEntry::make('cancellation_reason'),
                 TextEntry::make('created_at')->dateTime(),
+                RepeatableEntry::make('callbackLogs')
+                    ->label('Riwayat callback')
+                    ->state(fn (Invoice $record) => $record->callbackLogs)
+                    ->contained(false)
+                    ->table([
+                        TableColumn::make('Percobaan'),
+                        TableColumn::make('Event'),
+                        TableColumn::make('Status'),
+                        TableColumn::make('Terkirim pada'),
+                        TableColumn::make('Percobaan berikutnya'),
+                        TableColumn::make('Error'),
+                    ])
+                    ->schema([
+                        TextEntry::make('attempt'),
+                        TextEntry::make('event_type'),
+                        TextEntry::make('response_status')->placeholder('-'),
+                        TextEntry::make('succeeded_at')->dateTime()->placeholder('-'),
+                        TextEntry::make('next_retry_at')->dateTime()->placeholder('-'),
+                        TextEntry::make('error_message')->placeholder('-'),
+                    ])
+                    ->placeholder('Belum ada percobaan callback untuk invoice ini.')
+                    ->columnSpanFull(),
             ]);
     }
 }

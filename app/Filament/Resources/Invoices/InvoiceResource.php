@@ -26,6 +26,23 @@ class InvoiceResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    /**
+     * Jumlah invoice yang callback-nya gagal total setelah 6 percobaan —
+     * lihat SendCallbackJob::failed(). Ini penanda "butuh perhatian admin"
+     * yang disebut di docs/api-contract.md.
+     */
+    public static function getNavigationBadge(): ?string
+    {
+        $count = static::getModel()::whereNotNull('callback_failed_at')->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'danger';
+    }
+
     public static function infolist(Schema $schema): Schema
     {
         return InvoiceInfolist::configure($schema);

@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\InvoiceStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class Invoice extends Model
 {
@@ -87,5 +88,16 @@ final class Invoice extends Model
     public function confirmedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'confirmed_by');
+    }
+
+    /**
+     * Terbaru dulu — dipakai dashboard admin untuk menelusuri kenapa
+     * callback ke project gagal. Lihat docs/database.md.
+     *
+     * @return HasMany<CallbackLog, $this>
+     */
+    public function callbackLogs(): HasMany
+    {
+        return $this->hasMany(CallbackLog::class)->orderByDesc('id');
     }
 }

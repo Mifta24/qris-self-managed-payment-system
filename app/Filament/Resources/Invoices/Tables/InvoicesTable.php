@@ -73,6 +73,13 @@ class InvoicesTable
                 TextColumn::make('expires_at')
                     ->dateTime()
                     ->sortable(),
+                TextColumn::make('callback_failed_at')
+                    ->label('Callback')
+                    ->badge()
+                    ->color('danger')
+                    ->formatStateUsing(fn (): string => 'Gagal')
+                    ->placeholder('-')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -89,6 +96,9 @@ class InvoicesTable
                     ->default(),
                 SelectFilter::make('status')
                     ->options(InvoiceStatus::class),
+                Filter::make('callback_gagal')
+                    ->label('Callback gagal total')
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('callback_failed_at')),
             ])
             ->recordActions([
                 ViewAction::make(),
