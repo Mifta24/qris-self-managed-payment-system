@@ -46,7 +46,7 @@ fase kecuali ada alasan jelas.
 - [x] Scheduler expiry + expiry lazy saat invoice dibaca
 - [x] `SendCallbackJob` dengan signature dan retry berjenjang
 - [x] `callback_logs` per percobaan
-- [ ] Dashboard: invoice yang callback-nya gagal total
+- [x] Dashboard: invoice yang callback-nya gagal total
 - [ ] Uji scan di 6 aplikasi pembayar (lihat `docs/qris-spec.md`)
 
 ## Belum akan dikerjakan
