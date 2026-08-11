@@ -44,8 +44,8 @@ fase kecuali ada alasan jelas.
 ## Fase 5 — Sistem bisa ditinggal jalan
 
 - [x] Scheduler expiry + expiry lazy saat invoice dibaca
-- [ ] `SendCallbackJob` dengan signature dan retry berjenjang
-- [ ] `callback_logs` per percobaan
+- [x] `SendCallbackJob` dengan signature dan retry berjenjang
+- [x] `callback_logs` per percobaan
 - [ ] Dashboard: invoice yang callback-nya gagal total
 - [ ] Uji scan di 6 aplikasi pembayar (lihat `docs/qris-spec.md`)
 
