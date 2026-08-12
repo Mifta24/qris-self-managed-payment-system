@@ -5,10 +5,9 @@ developer di project lain yang mengintegrasikan API. Untuk detail kontrak
 teknis API, lihat `docs/api-contract.md`. Untuk alur sistem, lihat
 `docs/architecture.md`. Dokumen ini merangkum keduanya jadi langkah praktis.
 
-Status implementasi saat ini (lihat `docs/roadmap.md`): endpoint yang benar-benar
-aktif adalah **create, get detail, get status**. `cancel` dan `transactions`
-(daftar invoice per project) yang disebut di `docs/api-contract.md` **belum
-diimplementasikan** — jangan integrasikan project lain ke endpoint itu dulu.
+Endpoint aktif saat ini: **create, get detail, get status, cancel, dan list
+transactions** — semuanya sudah bisa diintegrasikan project lain. `confirm`
+dan `expire` tetap tidak tersedia lewat API, sesuai desain sistem (lihat §1).
 
 ---
 
@@ -229,7 +228,43 @@ API — itu murni tindakan manual admin di dashboard setelah mengecek mutasi
 GoPay Merchant. Jangan bangun asumsi bahwa project bisa "menandai lunas
 sendiri".
 
-### 2.5 Menerima callback
+### 2.5 Membatalkan invoice
+
+```
+POST /api/v1/invoices/{invoice_id}/cancel
+```
+
+Tidak ada body. Hanya bisa membatalkan invoice yang masih `waiting_payment`.
+Kalau `expires_at` invoice sudah lewat saat dipanggil, sistem meng-expire-nya
+dulu (bukan membatalkan) — jadi tetap dapat error, bukan sukses.
+
+Response `200` bentuknya sama dengan detail invoice, `status` jadi
+`cancelled`, dan callback `invoice.cancelled` dikirim kalau `callback_url`
+diisi. Error khusus: `invoice_not_cancellable` (409) kalau status invoice
+tidak boleh berpindah ke `cancelled` — misalnya sudah `paid` atau sudah
+dibatalkan sebelumnya.
+
+### 2.6 Melihat daftar invoice (transactions)
+
+```
+GET /api/v1/transactions?status=waiting_payment&per_page=20&page=1
+```
+
+Semua query param opsional: `status` (salah satu nilai `InvoiceStatus`),
+`external_id` (exact match), `per_page` (1–100, default 20), `page`.
+
+Beda dengan endpoint lain, response endpoint ini **dibungkus**
+`data`/`links`/`meta` ala pagination Laravel — bukan objek invoice langsung:
+
+```json
+{
+  "data": [ { "invoice_id": "INV-20260812-0001", "...": "..." } ],
+  "links": { "first": "...", "last": "...", "prev": null, "next": null },
+  "meta": { "current_page": 1, "per_page": 20, "total": 1 }
+}
+```
+
+### 2.7 Menerima callback
 
 Kalau `callback_url` diisi (saat buat project di dashboard, atau per invoice
 lewat field `callback_url` di body create), sistem akan mengirim `POST` ke
@@ -265,7 +300,7 @@ Aturan penting untuk penerima:
   kali kalau `X-Qris-Event-Id` sudah pernah diterima.
 - Jangan proses lama — timeout koneksi dari pengirim 10 detik.
 
-### 2.6 Format error
+### 2.8 Format error
 
 Semua error API v1 berbentuk:
 
@@ -286,12 +321,13 @@ Semua error API v1 berbentuk:
 | `api_key_revoked` | 401 | Key sudah dicabut/kedaluwarsa | Minta key baru ke admin |
 | `project_inactive` | 403 | Project dinonaktifkan admin | Hubungi admin |
 | `external_id_conflict` | 409 | `external_id` dipakai ulang dengan data beda | Perbaiki logika ID order di sisi pengirim |
+| `invoice_not_cancellable` | 409 | Cancel dipanggil pada invoice yang bukan `waiting_payment` | Cek status dulu lewat GET sebelum cancel, jangan retry naif |
 | `no_available_amount` | 503 | Rentang kode unik habis untuk merchant ini | Retry dengan backoff — ini kondisi nyata, bukan bug |
 | `validation_failed` | 422 | Body tidak lolos validasi | Cek `details` untuk field yang salah |
 | `invoice_not_found` | 404 | Invoice tidak ada / bukan milik project ini | — |
 | `rate_limit_exceeded` | 429 | Lampaui rate limit | Hormati header `Retry-After` |
 
-### 2.7 Rate limit
+### 2.9 Rate limit
 
 Per API key: **60 req/menit** untuk endpoint tulis (`POST /invoices`), **300
 req/menit** untuk endpoint baca (`GET`). Lampaui → `429` + header
@@ -373,4 +409,5 @@ berbeda untuk invoice yang sudah `paid`, `expired`, atau `cancelled`.
 - [ ] Endpoint callback: verifikasi signature, balas 2xx cepat, idempotent
       berdasarkan `X-Qris-Event-Id`
 - [ ] Tangani `no_available_amount` (503) dengan retry, bukan gagal permanen
-- [ ] Jangan panggil endpoint `cancel`/`transactions` — belum tersedia
+- [ ] Kalau perlu batalkan order dari sisi project, panggil `cancel` — jangan
+      cuma berhenti memproses tanpa memberi tahu sistem

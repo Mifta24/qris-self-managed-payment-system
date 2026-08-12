@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\ExternalIdConflictException;
+use App\Exceptions\InvalidStatusTransitionException;
 use App\Exceptions\NoAvailableAmountException;
 use App\Http\Middleware\VerifyApiSignature;
 use App\Support\ApiError;
@@ -52,6 +53,18 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return ApiError::make('no_available_amount', $e->getMessage(), 503);
+        });
+
+        // Satu-satunya jalur API yang bisa melempar exception ini adalah
+        // POST /invoices/{id}/cancel — kalau nanti ada endpoint API lain
+        // yang memicu transisi status tak valid, kode error di sini perlu
+        // dibedakan per target, bukan selalu invoice_not_cancellable.
+        $exceptions->render(function (InvalidStatusTransitionException $e, Request $request) {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+
+            return ApiError::make('invoice_not_cancellable', $e->getMessage(), 409);
         });
 
         $exceptions->render(function (ModelNotFoundException|NotFoundHttpException $e, Request $request) {

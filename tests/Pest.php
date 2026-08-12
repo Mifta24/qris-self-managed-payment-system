@@ -66,7 +66,11 @@ function callSigned(
 ): TestResponse {
     $body = $payload === [] ? '' : json_encode($payload, JSON_THROW_ON_ERROR);
 
-    $headers = ApiRequestSigner::headers($apiKeyPlain, $signingSecret, $method, $uri, $body, $timestamp);
+    // Signature dihitung dari path saja, sama seperti VerifyApiSignature
+    // yang memakai getPathInfo() (tanpa query string).
+    $path = strtok($uri, '?');
+
+    $headers = ApiRequestSigner::headers($apiKeyPlain, $signingSecret, $method, $path, $body, $timestamp);
 
     $headers = array_merge($headers, [
         'Content-Type' => 'application/json',

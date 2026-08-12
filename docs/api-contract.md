@@ -59,6 +59,57 @@ GET    /api/v1/transactions                  daftar invoice project
 `confirm` dan `expire` **tidak** tersedia untuk project. Konfirmasi hanya dari
 dashboard admin; expiry dijalankan sistem.
 
+### POST /api/v1/invoices/{invoice_id}/cancel
+
+Tidak ada body. Hanya bisa membatalkan invoice yang masih `waiting_payment`
+(state machine yang sama dengan `docs/architecture.md` — invoice yang sudah
+`manual_verification`, `paid`, `expired`, atau `cancelled` ditolak). Kalau
+`expires_at` invoice sudah lewat saat cancel dipanggil, sistem meng-expire-nya
+dulu (sama seperti `GET` detail/status), lalu tetap menolak cancel-nya dengan
+`invoice_not_cancellable`.
+
+Response `200` berbentuk sama dengan response detail invoice, `status` sudah
+`cancelled`. Callback `invoice.cancelled` dikirim ke `callback_url` seperti
+event lain.
+
+Error khusus: `invoice_not_cancellable` (HTTP 409) kalau status invoice tidak
+boleh berpindah ke `cancelled`.
+
+### GET /api/v1/transactions
+
+Daftar invoice milik project pemanggil, terbaru dulu. Endpoint ini **satu-
+satunya** di v1 yang responsnya dibungkus `data`/`links`/`meta` ala pagination
+Laravel — endpoint resource tunggal lain di atas sengaja tidak dibungkus.
+
+Query param (semua opsional):
+
+| Param | Isi |
+|---|---|
+| `status` | Filter exact match salah satu nilai `InvoiceStatus` |
+| `external_id` | Filter exact match |
+| `per_page` | 1–100, default 20 |
+| `page` | Standar pagination Laravel |
+
+```json
+{
+  "data": [
+    {
+      "invoice_id": "INV-20260812-0001",
+      "external_id": "ORDER-20260812-001",
+      "base_amount": 100000,
+      "unique_code": 237,
+      "payment_amount": 100237,
+      "status": "waiting_payment",
+      "payment_url": "https://pay.example.com/invoice/INV-20260812-0001",
+      "qr_image_url": "https://pay.example.com/qris/INV-20260812-0001.svg",
+      "expires_at": "2026-08-12T15:30:00+07:00"
+    }
+  ],
+  "links": { "first": "...", "last": "...", "prev": null, "next": null },
+  "meta": { "current_page": 1, "per_page": 20, "total": 1 }
+}
+```
+
 ### POST /api/v1/invoices
 
 ```json
