@@ -1,0 +1,93 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#fi-main-content"
+  - navigation "Topbar" [ref=e4]:
+    - link "QRIS Self-Managed Payment System" [ref=e6] [cursor=pointer]:
+      - /url: http://127.0.0.1:8765/admin
+    - button "User menu" [ref=e11] [cursor=pointer]:
+      - img "Avatar of Admin Preview" [ref=e12]
+  - generic [ref=e13]:
+    - navigation "Sidebar navigation" [ref=e16]:
+      - list [ref=e17]:
+        - listitem [ref=e18]:
+          - list [ref=e19]:
+            - listitem [ref=e20]:
+              - link "Dashboard" [ref=e21] [cursor=pointer]:
+                - /url: http://127.0.0.1:8765/admin
+            - listitem [ref=e25]:
+              - link "Api Keys" [ref=e26] [cursor=pointer]:
+                - /url: http://127.0.0.1:8765/admin/api-keys
+            - listitem [ref=e30]:
+              - link "Invoices" [ref=e31] [cursor=pointer]:
+                - /url: http://127.0.0.1:8765/admin/invoices
+            - listitem [ref=e35]:
+              - link "Projects" [ref=e36] [cursor=pointer]:
+                - /url: http://127.0.0.1:8765/admin/projects
+            - listitem [ref=e40]:
+              - link "Qris Merchants" [ref=e41] [cursor=pointer]:
+                - /url: http://127.0.0.1:8765/admin/qris-merchants
+    - main [ref=e46]:
+      - generic [ref=e48]:
+        - generic [ref=e50]:
+          - navigation "Breadcrumb" [ref=e51]:
+            - list [ref=e52]:
+              - listitem [ref=e53]:
+                - link "Qris Merchants" [ref=e54] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8765/admin/qris-merchants
+              - listitem [ref=e55]:
+                - generic [ref=e58]: Create
+          - heading "Create Qris Merchant" [level=1] [ref=e59]
+        - generic [ref=e65]:
+          - generic [ref=e69]:
+            - generic [ref=e72]:
+              - generic [ref=e76]:
+                - text: Code
+                - superscript [ref=e77]: "*"
+              - textbox "Code*" [ref=e81]
+            - generic [ref=e84]:
+              - generic [ref=e88]:
+                - text: Label
+                - superscript [ref=e89]: "*"
+              - textbox "Label*" [ref=e93]
+            - generic [ref=e96]:
+              - generic [ref=e97]: Scan dari foto QRIS
+              - generic [ref=e101]:
+                - button "Choose File" [ref=e105]
+                - generic [ref=e106]: Opsional. Ambil atau unggah foto stiker QRIS, lalu payload di bawah akan terisi otomatis untuk diperiksa sebelum disimpan.
+            - generic [ref=e112]:
+              - generic [ref=e116]:
+                - text: Payload QRIS statis
+                - superscript [ref=e117]: "*"
+              - generic [ref=e118]:
+                - textbox "Payload QRIS statis*" [ref=e122]
+                - generic [ref=e123]: Kosongkan untuk mempertahankan payload yang sudah ada. Isi hanya untuk menggantinya. Nilai yang tersimpan tidak pernah ditampilkan balik ke sini.
+            - generic [ref=e129]:
+              - generic [ref=e130]: Merchant name
+              - textbox "Merchant name" [ref=e137]
+            - generic [ref=e140]:
+              - generic [ref=e141]: Merchant city
+              - textbox "Merchant city" [ref=e148]
+            - generic [ref=e151]:
+              - generic [ref=e152]: National merchant id
+              - textbox "National merchant id" [ref=e159]
+            - generic [ref=e162]:
+              - generic [ref=e166]:
+                - text: Currency
+                - superscript [ref=e167]: "*"
+              - textbox "Currency*" [ref=e171]: "360"
+            - generic [ref=e177]:
+              - switch "Is active*" [checked] [ref=e178] [cursor=pointer]
+              - generic [ref=e179]:
+                - text: Is active
+                - superscript [ref=e180]: "*"
+            - generic [ref=e183]:
+              - generic [ref=e184]: Terakhir diverifikasi
+              - generic [ref=e188]:
+                - textbox "Terakhir diverifikasi" [ref=e191]
+                - generic [ref=e192]: Kapan payload ini terakhir diuji scan sungguhan.
+          - generic [ref=e200]:
+            - button "Create" [ref=e201] [cursor=pointer]
+            - button "Create & create another" [ref=e203] [cursor=pointer]
+            - button "Cancel" [ref=e204] [cursor=pointer]
+  - generic:
+    - status

@@ -1,0 +1,31 @@
+- generic [active] [ref=f2e1]:
+  - link "Skip to content" [ref=f2e2] [cursor=pointer]:
+    - /url: "#fi-main-content"
+  - navigation "Topbar" [ref=f2e4]:
+    - link "QRIS Self-Managed Payment System" [ref=f2e6] [cursor=pointer]:
+      - /url: http://127.0.0.1:8765/admin
+    - button "User menu" [ref=f2e11] [cursor=pointer]:
+      - img "Avatar of Admin Preview" [ref=f2e12]
+  - main [ref=f2e15]:
+    - generic [ref=f2e17]:
+      - heading "Dashboard" [level=1] [ref=f2e20]
+      - generic [ref=f2e27]:
+        - generic [ref=f2e31]:
+          - img "Avatar of Admin Preview" [ref=f2e32]
+          - generic [ref=f2e33]:
+            - heading "Welcome" [level=2] [ref=f2e34]
+            - paragraph [ref=f2e35]: Admin Preview
+          - button "Sign out" [ref=f2e37] [cursor=pointer]
+        - generic [ref=f2e44]:
+          - generic [ref=f2e45]:
+            - link [ref=f2e46] [cursor=pointer]:
+              - /url: https://filamentphp.com
+              - img "Filament" [ref=f2e47]
+            - paragraph [ref=f2e58]: v4.12.6
+          - generic [ref=f2e59]:
+            - link "Documentation" [ref=f2e60] [cursor=pointer]:
+              - /url: https://filamentphp.com/docs
+            - link "GitHub" [ref=f2e64] [cursor=pointer]:
+              - /url: https://github.com/filamentphp/filament
+  - generic:
+    - status
