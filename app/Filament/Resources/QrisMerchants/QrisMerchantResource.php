@@ -7,6 +7,7 @@ namespace App\Filament\Resources\QrisMerchants;
 use App\Filament\Resources\QrisMerchants\Pages\CreateQrisMerchant;
 use App\Filament\Resources\QrisMerchants\Pages\EditQrisMerchant;
 use App\Filament\Resources\QrisMerchants\Pages\ListQrisMerchants;
+use App\Filament\Resources\QrisMerchants\RelationManagers\ProjectsRelationManager;
 use App\Filament\Resources\QrisMerchants\Schemas\QrisMerchantForm;
 use App\Filament\Resources\QrisMerchants\Tables\QrisMerchantsTable;
 use App\Models\QrisMerchant;
@@ -38,6 +39,13 @@ class QrisMerchantResource extends Resource
             'index' => ListQrisMerchants::route('/'),
             'create' => CreateQrisMerchant::route('/create'),
             'edit' => EditQrisMerchant::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ProjectsRelationManager::class,
         ];
     }
 }

@@ -10,6 +10,7 @@ use App\Exceptions\InvalidStatusTransitionException;
 use App\Exceptions\LatePaymentAmountConflictException;
 use App\Exceptions\LatePaymentReasonRequiredException;
 use App\Models\Invoice;
+use App\Models\Project;
 use App\Services\InvoicePaymentConfirmationService;
 use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
@@ -53,9 +54,12 @@ class InvoicesTable
                     ->placeholder('-'),
                 TextColumn::make('base_amount')
                     ->label('Nominal dasar')
-                    ->formatStateUsing(fn (int $state): string => 'Rp '.number_format($state, 0, ',', '.')),
+                    ->formatStateUsing(fn (int $state): string => 'Rp '.number_format($state, 0, ',', '.'))
+                    ->sortable(),
                 TextColumn::make('unique_code')
-                    ->label('Kode unik'),
+                    ->label('Kode unik')
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('payment_amount')
                     ->label('Total pembayaran')
                     ->formatStateUsing(fn (int $state): string => 'Rp '.number_format($state, 0, ',', '.'))
@@ -96,6 +100,10 @@ class InvoicesTable
                     ->default(),
                 SelectFilter::make('status')
                     ->options(InvoiceStatus::class),
+                SelectFilter::make('project_id')
+                    ->label('Project')
+                    ->options(fn (): array => Project::query()->orderBy('name')->pluck('name', 'id')->all())
+                    ->searchable(),
                 Filter::make('callback_gagal')
                     ->label('Callback gagal total')
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('callback_failed_at')),

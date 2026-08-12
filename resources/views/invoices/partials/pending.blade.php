@@ -7,6 +7,14 @@
         Rp{{ number_format($invoice->base_amount, 0, ',', '.') }}
         + kode unik {{ $invoice->unique_code }}
     </p>
+    <button
+        type="button"
+        @click="copyAmount({{ $invoice->payment_amount }})"
+        class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-amber-600 hover:text-amber-700"
+    >
+        <span x-show="!amountCopied">Salin nominal</span>
+        <span x-show="amountCopied" x-cloak>Tersalin ✓</span>
+    </button>
 </div>
 
 <div class="mx-auto mt-6 aspect-square w-full max-w-[260px]">

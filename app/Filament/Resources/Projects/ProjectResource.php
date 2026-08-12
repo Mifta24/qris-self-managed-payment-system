@@ -7,6 +7,7 @@ namespace App\Filament\Resources\Projects;
 use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
 use App\Filament\Resources\Projects\Pages\ListProjects;
+use App\Filament\Resources\Projects\RelationManagers\ApiKeysRelationManager;
 use App\Filament\Resources\Projects\Schemas\ProjectForm;
 use App\Filament\Resources\Projects\Tables\ProjectsTable;
 use App\Models\Project;
@@ -40,6 +41,13 @@ class ProjectResource extends Resource
             'index' => ListProjects::route('/'),
             'create' => CreateProject::route('/create'),
             'edit' => EditProject::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ApiKeysRelationManager::class,
         ];
     }
 

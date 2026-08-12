@@ -7,6 +7,17 @@ Alpine.data('paymentPage', ({ status, expiresAt, statusUrl }) => ({
     remaining: '',
     countdownTimer: null,
     pollTimer: null,
+    amountCopied: false,
+
+    async copyAmount(amount) {
+        try {
+            await navigator.clipboard.writeText(String(amount));
+            this.amountCopied = true;
+            setTimeout(() => (this.amountCopied = false), 2000);
+        } catch (e) {
+            this.amountCopied = false;
+        }
+    },
 
     init() {
         // Countdown dan reload-saat-kedaluwarsa cuma relevan selama invoice
