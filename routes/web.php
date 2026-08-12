@@ -4,9 +4,7 @@ use App\Http\Controllers\InvoicePageController;
 use App\Http\Controllers\QrImageController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::redirect('/', '/admin');
 
 Route::get('/invoice/{invoice:invoice_number}', [InvoicePageController::class, 'show'])
     ->name('invoices.show');
