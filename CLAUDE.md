@@ -78,6 +78,7 @@ Baca yang relevan sebelum mengerjakan, jangan menebak:
 | Alur invoice, transisi status, modul | `docs/architecture.md` |
 | Gaya kode, struktur kelas, kebijakan test | `docs/conventions.md` |
 | Menentukan apa yang dikerjakan berikutnya | `docs/roadmap.md` |
+| Cara pakai dashboard admin atau integrasi API dari project lain | `docs/usage-guide.md` |
 
 ## Perintah
 
