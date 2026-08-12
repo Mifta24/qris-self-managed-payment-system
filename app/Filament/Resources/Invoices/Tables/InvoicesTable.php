@@ -22,6 +22,7 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
@@ -90,6 +91,12 @@ class InvoicesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('payment_amount')
+            ->groups([
+                Group::make('project.name')
+                    ->label('Project')
+                    ->collapsible(),
+            ])
+            ->defaultGroup('project.name')
             ->filters([
                 Filter::make('menunggu_konfirmasi')
                     ->label('Menunggu konfirmasi')
@@ -120,28 +127,32 @@ class InvoicesTable
             ->label('Konfirmasi')
             ->color('success')
             ->visible(fn (Invoice $record): bool => $record->status->canTransitionTo(InvoiceStatus::Paid))
+            ->modalDescription('Buka mutasi masuk di aplikasi GoPay Merchant, lalu cocokkan satu per satu dengan data di bawah sebelum menekan konfirmasi. Salah isi nominal atau RRN bisa membuat konfirmasi ditolak sistem atau salah menandai invoice.')
             ->schema(fn (Invoice $record): array => [
                 Placeholder::make('payment_amount_display')
-                    ->label('Total pembayaran')
-                    ->content('Rp '.number_format($record->payment_amount, 0, ',', '.')),
+                    ->label('Total pembayaran invoice')
+                    ->content('Rp '.number_format($record->payment_amount, 0, ',', '.'))
+                    ->helperText('Nominal ini yang wajib sama persis dengan mutasi masuk, termasuk kode uniknya. Bukan nominal yang perlu diketik ulang di bawah — cuma pembanding.'),
                 TextInput::make('confirmed_amount')
                     ->label('Nominal yang diterima')
-                    ->helperText('Ketik ulang nominal yang tertera di mutasi GoPay Merchant.')
+                    ->helperText('Ketik ulang nominal persis seperti yang tertera di mutasi GoPay Merchant. Kalau tidak sama dengan "Total pembayaran invoice" di atas, konfirmasi akan ditolak.')
                     ->numeric()
                     ->required(),
                 TextInput::make('confirmation_reference')
                     ->label('RRN / nomor referensi')
+                    ->helperText('Reference/Retrieval Number (RRN) dari detail mutasi GoPay Merchant — dipakai sebagai jejak pembayaran mana yang dicocokkan ke invoice ini.')
                     ->required(),
                 DateTimePicker::make('paid_at')
                     ->label('Waktu bayar')
                     ->default(now())
+                    ->helperText('Waktu uang benar-benar masuk menurut mutasi, bukan waktu sekarang saat form ini diisi. Nilai default cuma perkiraan awal, ubah kalau berbeda.')
                     ->required(),
                 Textarea::make('confirmation_note')
                     ->label('Catatan')
                     ->helperText(
                         $record->status === InvoiceStatus::Expired
-                            ? 'Wajib diisi: invoice ini sudah kedaluwarsa, jelaskan kenapa tetap dikonfirmasi.'
-                            : 'Opsional.'
+                            ? 'Wajib diisi: invoice ini sudah kedaluwarsa, jelaskan kenapa tetap dikonfirmasi (misalnya "customer bayar 40 detik setelah expired, mutasi sudah masuk").'
+                            : 'Opsional. Isi kalau ada hal yang tidak persis cocok (nominal, waktu) tapi konfirmasi tetap dilakukan, supaya admin lain paham alasannya.'
                     )
                     ->required($record->status === InvoiceStatus::Expired)
                     ->columnSpanFull(),
