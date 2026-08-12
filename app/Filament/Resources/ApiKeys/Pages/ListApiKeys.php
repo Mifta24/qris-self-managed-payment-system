@@ -39,13 +39,16 @@ class ListApiKeys extends ListRecords
             ->schema([
                 Select::make('project_id')
                     ->relationship('project', 'name')
-                    ->required(),
+                    ->required()
+                    ->helperText('Project pemilik key ini. Key hanya berlaku untuk memanggil API atas nama project yang dipilih.'),
                 TextInput::make('name')
-                    ->required(),
-                DateTimePicker::make('expires_at'),
+                    ->required()
+                    ->helperText('Label bebas untuk membedakan key ini, misalnya nama environment atau integrasi yang memakainya.'),
+                DateTimePicker::make('expires_at')
+                    ->helperText('Setelah waktu ini, key otomatis ditolak di setiap permintaan API. Kosongkan untuk tidak pernah kedaluwarsa.'),
                 TagsInput::make('allowed_ips')
                     ->label('IP yang diizinkan')
-                    ->helperText('Kosongkan untuk mengizinkan semua IP.'),
+                    ->helperText('Kosongkan untuk mengizinkan semua IP. Catatan: pembatasan IP ini belum aktif diterapkan di sisi server, tersimpan tapi belum memfilter permintaan API.'),
             ])
             ->action(function (array $data): void {
                 $generatedKey = (new ApiKeyGenerator)->generate();

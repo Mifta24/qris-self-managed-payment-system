@@ -25,13 +25,16 @@ class ApiKeyForm
             ->components([
                 Placeholder::make('key_prefix')
                     ->label('API Key (prefix)')
-                    ->content(fn ($record): string => $record->key_prefix.'…'),
+                    ->content(fn ($record): string => $record->key_prefix.'…')
+                    ->helperText('Hanya prefix yang tersimpan dan ditampilkan. Key lengkapnya cuma muncul sekali saat dibuat dan tidak bisa dilihat lagi dari sini.'),
                 TextInput::make('name')
-                    ->required(),
+                    ->required()
+                    ->helperText('Label bebas untuk membedakan key ini, misalnya nama environment atau integrasi yang memakainya.'),
                 TagsInput::make('allowed_ips')
                     ->label('IP yang diizinkan')
-                    ->helperText('Kosongkan untuk mengizinkan semua IP.'),
-                DateTimePicker::make('expires_at'),
+                    ->helperText('Kosongkan untuk mengizinkan semua IP. Catatan: pembatasan IP ini belum aktif diterapkan di sisi server, tersimpan tapi belum memfilter permintaan API.'),
+                DateTimePicker::make('expires_at')
+                    ->helperText('Setelah waktu ini, key otomatis ditolak di setiap permintaan API (respons api_key_revoked). Kosongkan untuk tidak pernah kedaluwarsa.'),
             ]);
     }
 }
