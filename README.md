@@ -45,7 +45,7 @@ Alur lengkap dan tabel transisi status ada di [docs/architecture.md](docs/archit
 
 - PHP 8.3, Laravel 13, `declare(strict_types=1)` di semua file
 - PostgreSQL
-- Redis + Horizon (queue), Laravel Scheduler (expiry)
+- Laravel Queue (saat ini driver `database`; Redis + Horizon direncanakan, belum terpasang), Laravel Scheduler (expiry)
 - Filament 4 (dashboard admin)
 - Blade + Alpine + Tailwind (halaman pembayaran)
 - Pest (test)
@@ -53,7 +53,7 @@ Alur lengkap dan tabel transisi status ada di [docs/architecture.md](docs/archit
 
 ## Memulai
 
-Prasyarat: PHP 8.3+, Composer, Node.js, PostgreSQL, Redis.
+Prasyarat: PHP 8.3+, Composer, Node.js, PostgreSQL.
 
 ```bash
 composer install
@@ -63,8 +63,9 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Atur koneksi database dan queue di `.env` (bawaan `.env.example` masih
-SQLite dan queue `database`; sistem ini dirancang untuk PostgreSQL dan Redis):
+Atur koneksi database di `.env` (bawaan `.env.example` masih SQLite; sistem
+ini dirancang untuk PostgreSQL). Queue memakai driver `database`, jadi tidak
+perlu Redis untuk saat ini:
 
 ```dotenv
 DB_CONNECTION=pgsql
@@ -74,7 +75,7 @@ DB_DATABASE=qris
 DB_USERNAME=...
 DB_PASSWORD=...
 
-QUEUE_CONNECTION=redis
+QUEUE_CONNECTION=database
 ```
 
 Lalu:
@@ -90,8 +91,9 @@ Buat user admin untuk login ke dashboard Filament
 ### Menjalankan di lokal
 
 ```bash
+compeser dev               # All in one cmd
 php artisan serve          # aplikasi
-php artisan horizon        # worker queue
+php artisan queue:work     # worker queue
 php artisan schedule:work  # scheduler (expiry invoice)
 npm run dev                # asset
 ```

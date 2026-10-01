@@ -47,7 +47,8 @@ tanyakan**, jangan cari jalan pintas.
 
 - Laravel + PHP 8.3, `declare(strict_types=1)` di semua file
 - PostgreSQL (partial unique index dipakai untuk kunci nominal)
-- Redis + Horizon untuk queue, Laravel Scheduler untuk expiry
+- Laravel Queue dengan driver `database` (Redis + Horizon belum terpasang),
+  Laravel Scheduler untuk expiry
 - Filament untuk dashboard admin
 - Blade + Alpine + Tailwind untuk halaman pembayaran publik
 - Pest untuk test
@@ -87,7 +88,7 @@ php artisan migrate                # PostgreSQL, lihat catatan MySQL di migratio
 php artisan test                   # seluruh test
 php artisan test --filter=Qris     # hanya domain QRIS
 ./vendor/bin/pint                  # formatter
-php artisan horizon                # worker queue (dev)
+php artisan queue:work             # worker queue (dev)
 php artisan schedule:work          # scheduler (dev)
 ```
 
