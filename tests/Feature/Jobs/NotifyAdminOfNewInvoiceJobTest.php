@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Jobs\NotifyAdminOfNewInvoiceJob;
 use App\Models\Project;
 use App\Models\QrisMerchant;
+use App\Models\User;
 use App\Services\InvoiceService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
@@ -82,4 +83,20 @@ it('logs a warning and does not call the http client when telegram config is mis
     (new NotifyAdminOfNewInvoiceJob($invoice))->handle();
 
     Http::assertNothingSent();
+});
+
+it('sends the in-app notification to admins only, never to sellers', function () {
+    config(['services.telegram.bot_token' => null, 'services.telegram.admin_chat_id' => null]);
+
+    $admin = User::factory()->admin()->create();
+    $seller = User::factory()->create();
+
+    // Antrian sync: pembuatan invoice langsung menjalankan job notifikasinya.
+    app(InvoiceService::class)->create($this->project, [
+        'external_id' => 'ORDER-1',
+        'amount' => 100000,
+    ]);
+
+    expect($admin->notifications()->count())->toBe(1)
+        ->and($seller->notifications()->count())->toBe(0);
 });

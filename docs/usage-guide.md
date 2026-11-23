@@ -69,8 +69,17 @@ Menu **Akun Penjual** → New.
 1. Isi nama, email (untuk login), dan password (minimal 10 karakter).
 2. Pilih **Toko yang boleh dilihat** (satu atau lebih QRIS Merchant). Penjual
    hanya bisa melihat dan mengonfirmasi pembayaran untuk toko yang dipilih.
-3. Beri tahu penjual alamat `/toko` dan kredensialnya. Tidak ada pendaftaran
-   mandiri.
+3. Beri tahu penjual alamat `/toko` dan kredensialnya.
+
+**Pendaftaran mandiri dengan persetujuan.** Penjual juga bisa mendaftar sendiri
+di `/toko/register` (nama, email, nama toko + WhatsApp, password). Akun hasil
+pendaftaran **belum punya toko**, jadi belum bisa masuk: saat login mereka
+melihat pesan "belum disetujui admin". Admin mendapat notifikasi di dashboard
+dan menu **Akun Penjual** menampilkan badge jumlah yang menunggu (filter
+"Menunggu persetujuan"). Untuk menyetujui, buka akunnya, pilih toko, simpan.
+Untuk menolak, tekan **Tolak pendaftaran** (menghapus akun; hanya tersedia
+untuk akun yang belum punya toko). Pendaftaran dibatasi rate limit bawaan
+Filament dan belum memakai verifikasi email.
 
 Akun penjual tidak bisa membuka `/admin`, dan akun admin tidak dibuat dari
 menu ini. Admin pertama dibuat lewat `tinker` / seeder dengan `is_admin = true`.

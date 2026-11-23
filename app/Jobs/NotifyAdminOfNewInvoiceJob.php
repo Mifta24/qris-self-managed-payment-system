@@ -63,7 +63,7 @@ final class NotifyAdminOfNewInvoiceJob implements ShouldQueue
         Notification::make()
             ->title('Invoice baru: '.$this->invoice->invoice_number)
             ->body("{$this->invoice->project->name} — Rp {$amount}. Bukan konfirmasi pembayaran.")
-            ->sendToDatabase(User::all());
+            ->sendToDatabase(User::query()->where('is_admin', true)->get());
     }
 
     private function message(): string

@@ -70,6 +70,11 @@ invoice tidak aktif — sudah ada di migration.
 mengisi `true` untuk user yang sudah ada saat kolom ditambahkan, karena dulu
 semua user adalah admin. Kolom ini tidak ada di `#[Fillable]` model `User`.
 
+`registration_note` (text, nullable) diisi penjual saat mendaftar sendiri (nama
+toko + kontak) supaya admin tahu siapa yang mendaftar. Hanya informasi, tidak
+dipakai untuk keputusan akses; akses ditentukan `is_admin` dan pivot
+`qris_merchant_user`.
+
 ### `qris_merchant_user`
 Pivot akun penjual ke toko (`qris_merchants`). Unik per pasangan. Dipakai panel
 `/toko` (tenancy Filament per `QrisMerchant`) untuk membatasi data dan hak

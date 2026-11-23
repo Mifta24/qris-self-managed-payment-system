@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\Seller\Pages\Auth\RegisterSeller;
+use App\Filament\Seller\Pages\Auth\SellerLogin;
 use App\Filament\Seller\Pages\Dashboard;
 use App\Http\Middleware\UseIndonesianLocale;
 use App\Models\QrisMerchant;
@@ -33,7 +35,8 @@ final class SellerPanelProvider extends PanelProvider
         return $panel
             ->id('seller')
             ->path('toko')
-            ->login()
+            ->login(SellerLogin::class)
+            ->registration(RegisterSeller::class)
             ->brandName('Kasir QRIS')
             ->colors([
                 'primary' => Color::Emerald,

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SellerAccounts\Schemas;
 
+use App\Models\User;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -24,6 +26,12 @@ class SellerAccountForm
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
+                Textarea::make('registration_note')
+                    ->label('Catatan pendaftar (nama toko dan kontak)')
+                    ->disabled()
+                    ->dehydrated(false)
+                    ->visible(fn (?User $record): bool => filled($record?->registration_note))
+                    ->columnSpanFull(),
                 TextInput::make('password')
                     ->label('Password')
                     ->password()
@@ -38,7 +46,7 @@ class SellerAccountForm
                     ->multiple()
                     ->preload()
                     ->required()
-                    ->helperText('Penjual hanya bisa melihat dan mengonfirmasi pembayaran untuk toko yang dipilih di sini.'),
+                    ->helperText('Penjual hanya bisa melihat dan mengonfirmasi pembayaran untuk toko yang dipilih di sini. Untuk menyetujui pendaftar baru, pilih tokonya lalu simpan.'),
             ]);
     }
 }

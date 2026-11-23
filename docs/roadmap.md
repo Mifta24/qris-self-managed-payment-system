@@ -58,6 +58,7 @@ fase kecuali ada alasan jelas.
 - [x] Konfirmasi "Uang sudah masuk" lewat `InvoicePaymentConfirmationService`
 - [x] Halaman Cara Pakai
 - [x] Admin: menu Akun Penjual
+- [x] Pendaftaran mandiri penjual dengan persetujuan admin (`/toko/register`)
 - [ ] Notifikasi untuk penjual (Telegram/email saat ada pembayaran menunggu)
 - [ ] Mode kasir: penjual membuat tagihan sendiri tanpa lewat API project
 
