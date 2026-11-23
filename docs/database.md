@@ -65,6 +65,16 @@ manual bisa menandai invoice yang salah sebagai lunas. **Jangan pernah dihapus
 atau dilonggarkan.** Di MySQL 8 padanannya generated column bernilai NULL saat
 invoice tidak aktif — sudah ada di migration.
 
+### `users` (kolom `is_admin`)
+`is_admin` (boolean, default `false`) menentukan akses panel `/admin`. Migration
+mengisi `true` untuk user yang sudah ada saat kolom ditambahkan, karena dulu
+semua user adalah admin. Kolom ini tidak ada di `#[Fillable]` model `User`.
+
+### `qris_merchant_user`
+Pivot akun penjual ke toko (`qris_merchants`). Unik per pasangan. Dipakai panel
+`/toko` (tenancy Filament per `QrisMerchant`) untuk membatasi data dan hak
+konfirmasi ke toko milik akun tersebut. `cascadeOnDelete` di kedua sisi.
+
 ### `callback_logs`
 Satu baris per **percobaan**, bukan per event. Retry membuat baris baru dengan
 `event_id` sama dan `attempt` bertambah. Tanpa ini, menelusuri "kenapa project X

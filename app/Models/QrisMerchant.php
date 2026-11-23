@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-final class QrisMerchant extends Model
+final class QrisMerchant extends Model implements HasName
 {
     protected $fillable = [
         'code',
@@ -52,5 +54,23 @@ final class QrisMerchant extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    /**
+     * Akun penjual yang boleh membuka panel /toko untuk merchant ini.
+     *
+     * @return BelongsToMany<User, $this>
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)->withTimestamps();
+    }
+
+    /**
+     * Nama toko di pemilih toko panel /toko.
+     */
+    public function getFilamentName(): string
+    {
+        return $this->label;
     }
 }

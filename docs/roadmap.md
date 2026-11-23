@@ -49,6 +49,18 @@ fase kecuali ada alasan jelas.
 - [x] Dashboard: invoice yang callback-nya gagal total
 - [ ] Uji scan di 6 aplikasi pembayar (lihat `docs/qris-spec.md`)
 
+## Fase 6 — Dashboard penjual UMKM
+
+- [x] Kolom `users.is_admin` + pivot `qris_merchant_user`; akses panel per role
+- [x] Panel `/toko` (tenancy per QrisMerchant), bahasa Indonesia
+- [x] Beranda: uang masuk hari ini/bulan ini, menunggu dicek, uang masuk terakhir
+- [x] Daftar pembayaran per tab + filter periode + total
+- [x] Konfirmasi "Uang sudah masuk" lewat `InvoicePaymentConfirmationService`
+- [x] Halaman Cara Pakai
+- [x] Admin: menu Akun Penjual
+- [ ] Notifikasi untuk penjual (Telegram/email saat ada pembayaran menunggu)
+- [ ] Mode kasir: penjual membuat tagihan sendiri tanpa lewat API project
+
 ## Belum akan dikerjakan
 
 Provider adapter, refund, settlement tracking, rekonsiliasi otomatis, laporan

@@ -59,6 +59,29 @@ Menu **API Keys** → **Buat API Key**.
 
 Sampai di sini, project lain sudah bisa mulai memanggil API.
 
+### 1.4 Buat akun penjual (dashboard penjual `/toko`)
+
+Penjual UMKM tidak memakai `/admin`. Mereka memakai dashboard terpisah di
+`/toko` yang bahasanya sehari-hari dan hanya menampilkan data toko mereka.
+
+Menu **Akun Penjual** → New.
+
+1. Isi nama, email (untuk login), dan password (minimal 10 karakter).
+2. Pilih **Toko yang boleh dilihat** (satu atau lebih QRIS Merchant). Penjual
+   hanya bisa melihat dan mengonfirmasi pembayaran untuk toko yang dipilih.
+3. Beri tahu penjual alamat `/toko` dan kredensialnya. Tidak ada pendaftaran
+   mandiri.
+
+Akun penjual tidak bisa membuka `/admin`, dan akun admin tidak dibuat dari
+menu ini. Admin pertama dibuat lewat `tinker` / seeder dengan `is_admin = true`.
+
+Penjual bisa: melihat daftar pembayaran (tab Menunggu dicek, Sudah dibayar,
+Kedaluwarsa, Semua), memfilter periode, melihat total, dan menekan **Uang sudah
+masuk** untuk mengonfirmasi. Konfirmasi memakai service dan aturan yang sama
+dengan admin (nominal wajib cocok, catatan wajib untuk pembayaran terlambat,
+audit log mencatat user penjual sebagai pelaku). Penjual tidak melihat API key,
+payload QRIS, callback, atau log audit.
+
 ---
 
 ## 2. Integrasi dari project lain (pemanggil API)

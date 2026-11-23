@@ -10,7 +10,8 @@ QRIS Payment System
 ├── QRIS               parser TLV, CRC16, generator nominal   [SUDAH JADI]
 ├── QR Render          payload -> SVG, dicache, tidak disimpan sebagai file
 ├── Payment Page       halaman publik per invoice, polling status
-├── Admin Dashboard    Filament: project, API key, antrian verifikasi
+├── Admin Dashboard    Filament: project, API key, antrian verifikasi, akun penjual
+├── Seller Dashboard   Filament /toko: pembayaran toko sendiri, konfirmasi uang masuk
 ├── Verification       konfirmasi manual oleh admin
 ├── Notification       Telegram (utama), email, WhatsApp (opsional)
 ├── Callback           pengiriman event ke project + retry + log
@@ -45,7 +46,7 @@ transaksi. Kalau dipisah, ada jendela waktu di mana nominal belum terkunci.
 Customer bayar via QRIS
         │
         ▼
-Admin buka aplikasi GoPay Merchant, lihat mutasi masuk
+Admin (atau penjual pemilik toko lewat /toko) buka aplikasi GoPay Merchant, lihat mutasi masuk
         │
         ▼
 Admin cari invoice dengan payment_amount yang cocok di dashboard
