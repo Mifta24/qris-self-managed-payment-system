@@ -39,7 +39,7 @@ tanyakan**, jangan cari jalan pintas.
 6. **Setiap perubahan status invoice menulis audit log.** Tanpa pengecualian,
    termasuk perubahan yang dipicu scheduler.
 7. **Jangan bikin endpoint yang mengubah status invoice jadi `paid` lewat API
-   project.** Konfirmasi hanya dari dashboard admin oleh user yang login.
+   project.** Konfirmasi hanya dari dashboard (admin, atau penjual yang terhubung ke merchant invoice itu) oleh user yang login.
 8. **Jangan pasang library QRIS pihak ketiga.** Parser dan CRC ditulis sendiri
    di `app/Support/Qris` supaya bisa diaudit. Lihat `docs/qris-spec.md`.
 
